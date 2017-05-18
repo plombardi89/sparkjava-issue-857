@@ -1,0 +1,51 @@
+buildscript {
+  ext.kotlinVersion = '1.1.2'
+
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+version = '1.0'
+
+ext {
+  sparkVersion   = '2.6.0'
+  logbackVersion = '1.1.7'
+}
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
+  compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlinVersion
+
+  compile group: 'com.sparkjava', name: 'spark-core', version: sparkVersion
+  compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+
+  testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task fatJar(type: Jar) {
+  manifest {
+    attributes 'Implementation-Title'   : 'Spark Microservice',
+               'Implementation-Version' : version,
+               'Main-Class'             : 'io.datawire.example.HelloWorldService'
+  }
+
+  baseName = project.name + '-fat'
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+  with jar
+}
+
+task wrapper(type: Wrapper) {
+  version = '3.5'
+}
